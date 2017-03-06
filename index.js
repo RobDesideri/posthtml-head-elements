@@ -120,11 +120,20 @@ module.exports = function(options) {
   options = options || {};
   options.headElementsTag = options.headElementsTag || 'posthtml-head-elements';
 
-  if (!options.headElements) {
-    util.log('posthtml-head-elements: Don\'t forget to add a link to the JSON file containing the head elements to insert');
+  if (!options.headElements && !options.headElementsByString) {
+    util.log('posthtml-head-elements: Don\'t forget to add a link or a string containing the head elements to insert in JSON format.');
   }
 
-  var jsonOne = JSON.parse(fs.readFileSync(options.headElements), 'utf8');
+  if (options.headElements && options.headElementsByString) {
+    util.log('posthtml-head-elements: Setted both headElements and headElementsByString options. The headElements option win.');
+  }
+
+  var jsonOne
+  if (options.headElements) {
+    jsonOne = JSON.parse(fs.readFileSync(options.headElements), 'utf8');
+  } else {
+    jsonOne = JSON.parse(options.headElementsByString)
+  }
 
   return function posthtmlHeadElements(tree) {
 
